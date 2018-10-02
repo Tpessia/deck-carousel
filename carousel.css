@@ -1,0 +1,29 @@
+#carousel {
+    position: relative;
+    display: inline-block;
+    width: 400px;
+    height: 500px;
+}
+
+.carousel-item {
+    position: absolute;
+    display: inline-block;
+    width: 300px;
+    height: 400px;
+    background-color: #4854ffcc;
+}
+
+.carousel-item:nth-child(1) {
+    margin-top: 100px; /* = (#carousel:width - .carousel-item:width) / $(".carousel-item").length */
+    margin-left: 100px;
+}
+
+.carousel-item:nth-child(2) {
+    margin-top: 50px;
+    margin-left: 50px;
+}
+
+.carousel-item:nth-child(3) {
+    margin-top: 0px;
+    margin-left: 0px;
+}
