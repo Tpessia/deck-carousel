@@ -14,16 +14,16 @@
 }
 
 .carousel-item:nth-child(1) {
-    margin-top: 100px; /* = (#carousel:width - .carousel-item:width) / $(".carousel-item").length */
-    margin-left: 100px;
+    top: 100px; /* = (#carousel:width - .carousel-item:width) / $(".carousel-item").length */
+    left: 100px;
 }
 
 .carousel-item:nth-child(2) {
-    margin-top: 50px;
-    margin-left: 50px;
+    top: 50px;
+    left: 50px;
 }
 
 .carousel-item:nth-child(3) {
-    margin-top: 0px;
-    margin-left: 0px;
+    top: 0px;
+    left: 0px;
 }

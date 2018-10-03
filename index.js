@@ -1,9 +1,9 @@
 $(function () {
-    deckCarousel = new DeckCarousel($("#carousel")[0]);
+    let deckCarousel = new DeckCarousel($("#carousel")[0], 300, 50, 500);
 
     $("#carousel").on("crslNext", function () {
-        console.log("next");
+        deckCarousel.next();
     }).on("crslPrev", function () {
-        console.log("prev");
+        deckCarousel.prev();
     });
 });
