@@ -1,29 +1,51 @@
+body,
+html {
+    margin: 0px;
+    overflow-x: hidden;
+}
+
 #carousel {
+    display: none;
     position: relative;
-    display: inline-block;
-    width: 400px;
-    height: 500px;
+    margin: 50px auto;
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .carousel-item {
+    font-family: 'Roboto';
     position: absolute;
     display: inline-block;
-    width: 300px;
-    height: 400px;
-    background-color: #4854ffcc;
+    background-color: #ffffff;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
 }
 
-.carousel-item:nth-child(1) {
-    top: 100px; /* = (#carousel:width - .carousel-item:width) / $(".carousel-item").length */
-    left: 100px;
+.carousel-item__img {
+    
 }
 
-.carousel-item:nth-child(2) {
-    top: 50px;
-    left: 50px;
+.carousel-item__img img {
+    display: block;
+    max-width: 100%;
 }
 
-.carousel-item:nth-child(3) {
-    top: 0px;
-    left: 0px;
+.carousel-item__title {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.carousel-item__body {
+    margin: 10px 15px;
+}
+
+.carousel-item__body p {
+    margin-top: 0;
 }

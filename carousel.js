@@ -1,32 +1,64 @@
 'use strict';
 
 class DeckCarousel {
-    constructor(elem, width, margin, animTime) {
+    constructor(elem, cardsClass, crslStyles, cardStyles, animTime, fit) {
+        const $self = this;
         this.carousel = elem;
-        this.length = $(elem).find(".carousel-item").length;
+        this.cardsClass = cardsClass;
+        this.length = $(elem).find(cardsClass).length;
         this.direction = null;
         this.animTime = animTime;
-        this.data = {
-            width: width,
-            margin: margin
+        this.styles = {
+            crsl: {
+                width: crslStyles.width,
+                height: crslStyles.height
+            },
+            card: {
+                width: cardStyles.width,
+                maxMargin: crslStyles.width - cardStyles.width,
+                margin: (crslStyles.width - cardStyles.width) / ($self.length - 1)
+            }
         }
 
-        const $self = this;
-        $(".carousel-item").each(function (i) {
-            const marginMult = $self - i - 1;
+        $(this.carousel).css({
+            "display": "block",
+            "width": this.styles.crsl.width
+        });
+        $(this.cardsClass).each(function (i) {
+            const marginMult = $self.length - i - 1;
 
             $(this).css({
-                width: width,
-                top: margin * marginMult,
-                left: margin * marginMult
+                "width": $self.styles.card.width,
+                "top": $self.styles.card.margin * marginMult,
+                "left": $self.styles.card.margin * marginMult,
+                "z-index": marginMult
             });
+
+            $(this).attr("data-position", (i + 1));
         });
 
-        this.startDragEvent();
+        if (typeof fit !== "undefined" && fit) {
+            this.styles.crsl.height = $(this.cardsClass).height() + $self.styles.card.maxMargin;
+        }
+
+        $(this.carousel).css("height", $self.styles.crsl.height);
+        $(this.cardsClass).css("height", $self.styles.crsl.height - $self.styles.card.maxMargin);
+
+        this.bindDragEvent();
+        this.bindCrslMov();
     }
+
 
     get $carousel() {
         return $(this.carousel);
+    }
+
+    get cards() {
+        return $(this.cardsClass).toArray();
+    }
+
+    get $cards() {
+        return $(this.cardsClass);
     }
 
     get topCard() {
@@ -53,11 +85,13 @@ class DeckCarousel {
         return $(".carousel-item[data-position=" + i + "]");
     }
 
-    startDragEvent() {
+
+    bindDragEvent() {
         const $self = this;
 
         // Event to initiate drag, include touchstart events
         $self.$carousel.on('mousedown touchstart', function (e) {
+            e.preventDefault();
             let initX = null;
             // Drag start logic
             // ...
@@ -83,64 +117,110 @@ class DeckCarousel {
                     }
 
                     $(this).off('mousemove touchmove');
-                    $self.stopDragEvent();
+                    $self.removeDragEvent();
                     $self.$carousel.one("crslAnimEnd", function () {
-                        $self.startDragEvent();
+                        $self.bindDragEvent();
                     });
                 }
 
                 initX = e.pageX || e.changedTouches[0].pageX;
-
-                console.log(initX);
             });
         });
     }
 
-    stopDragEvent() {
+    removeDragEvent() {
         this.$carousel.off('mousedown touchstart');
     }
+
 
     next() {
         const $self = this;
 
-        $self.$topCard.animate({ left: "+=" + $self.data.width }, $self.animTime / 3).animate({ top: 0, left: $self.data.width }, $self.animTime / 3).animate({ left: 0 }, $self.animTime / 3);
+        $self.$topCard
+            .animate({ left: "+=" + ($self.styles.card.width + 10) }, $self.animTime / 3)
+            .animate({ top: 0, left: ($self.styles.card.width + 10) }, $self.animTime / 3)
+            .animate({ left: 0 }, $self.animTime / 3);
 
-        $(".carousel-item:not([data-position=1])").animate({ top: "+=" + $self.data.margin, left: "+=" + $self.data.margin }, $self.animTime, function () {
+        $(".carousel-item:not([data-position=1])").animate({ top: "+=" + $self.styles.card.margin, left: "+=" + $self.styles.card.margin }, $self.animTime, function () {
             $self.$carousel.trigger("crslAnimEnd");
         });
 
-        $(".carousel-item").each(function () {
+        $self.$cards.each(function () {
             const dataPos = parseInt($(this).attr("data-position"));
             
             if (dataPos == 1) {
                 $(this).attr("data-position", $self.length);
             } else {
                 $(this).attr("data-position", dataPos - 1);
-            }	
+            }
+
+            setTimeout((elem) => {
+                let zIndex = $self.length - $(elem).attr("data-position");
+                $(elem).css("z-index", zIndex);
+            }, $self.animTime / 3, this);
         });
     }
 
     prev() {
         const $self = this,
-            topCardMargin = $self.$topCard.css("top");
-
+            topCardMargin = $self.styles.card.margin * ($self.length - 1);
+            
         $self.$bottomCard
-            .animate({ left: "-=" + $self.data.width }, $self.animTime / 3)
-            .animate({ top: topCardMargin, left: topCardMargin - $self.data.width }, $self.animTime / 3)
+            .animate({ left: "-=" + ($self.styles.card.width + 10) }, $self.animTime / 3)
+            .animate({ top: topCardMargin, left: topCardMargin - ($self.styles.card.width + 10) }, $self.animTime / 3)
             .animate({ left: topCardMargin }, $self.animTime / 3);
 
-        $(".carousel-item:not([data-position=" + $self.length + "])").animate({ top: "-=" + 50, left: "-=" + 50 }, $self.animTime, function () {
+        $(".carousel-item:not([data-position=" + $self.length + "])").animate({ top: "-=" + $self.styles.card.margin, left: "-=" + $self.styles.card.margin }, $self.animTime, function () {
             $self.$carousel.trigger("crslAnimEnd");
         });
 
-        $(".carousel-item").each(function () {
+        $self.$cards.each(function () {
             const dataPos = parseInt($(this).attr("data-position"));
             
             if (dataPos == $self.length) {
                 $(this).attr("data-position", 1);
             } else {
                 $(this).attr("data-position", dataPos + 1);
-            }	
+            }
+
+            setTimeout((elem) => {
+                let zIndex = $self.length - $(elem).attr("data-position");
+                $(elem).css("z-index", zIndex);
+            }, $self.animTime / 3, this);
         });
+    }
+
+    bindCrslMov() {
+        $("#carousel").on("crslNext", function () {
+            deckCarousel.next();
+        }).on("crslPrev", function () {
+            deckCarousel.prev();
+        });
+    }
+
+    removeCrslMov() {
+        this.$carousel.off('crslNext crslPrev');
+    }
+
+
+    remove() {
+        this.removeDragEvent();
+        this.removeCrslMov();
+        this.$carousel.css({
+            "display": "",
+            "height": "",
+            "width": "",
+            "cursor": ""
+        });
+        this.$cards.css({
+            "width": "",
+            "top": "",
+            "left": ""
+        });
+    }
+
+    reset() {
+        this.remove();
+        new DeckCarousel(this.carousel, this.cardsClass, this.styles.crsl, this.styles.card, this.animTime);
     }
 }
